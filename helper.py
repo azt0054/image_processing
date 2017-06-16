@@ -77,15 +77,15 @@ def resize(image,background_color=background_color):
 
     if diff_height<diff_width:
         current_ratio = current_width/float(current_height)
-        new_height = int(height-margin*2)
+        new_height = int(height-resize_margin*2)
         new_width = int(height*(current_ratio))
-        y_offset = margin
+        y_offset = resize_margin
         x_offset = (width - new_width)/2
     else:
         current_ratio = current_height/float(current_width)
-        new_width = int(width-margin*2)
+        new_width = int(width-resize_margin*2)
         new_height = int(width*(current_ratio))
-        x_offset = margin
+        x_offset = resize_margin
         y_offset = (height - new_height)/2
 
     resized_with_aspect_ratio = cv2.resize(image, (new_width,new_height))

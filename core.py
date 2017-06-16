@@ -28,8 +28,12 @@ class CVFilter:
     def save(self):
         if self.processed:
             mod_filename = os.path.join(processed_image_dir,self.org_filename.split("/")[-1])
-            image_stages = vStack(hStack(*self.image_list[:3]), \
-                    hStack(*self.image_list[3:6]),)
+            total_images = len(self.image_list)
+            if total_images>2:
+                image_stages = vStack(hStack(*self.image_list[:total_images/2]), \
+                        hStack(*self.image_list[total_images/2:total_images]),)
+            else:
+                image_stages = hStack(*self.image_list)
             cv2.imwrite(mod_filename,image_stages)
         else:
             log("processing failed!")
@@ -213,10 +217,8 @@ class CVFilter:
             normal_grabcut,blended_grabcut  = self.rectGrabcut((x,y,width,height),mask_info)
             self.processed = True
 
-            self.image_list = [self.image_grayscale,self.basic_edge,inverse_mask, \
-                            normal_grabcut,blended_grabcut,self.org_image]
-            self.image_names = ["GrayScale","GammaCorrect","Mask", \
-                            "Grabcut","Blended","Original"]
+            self.image_list = [resize(self.org_image,0),resize(blended_grabcut)]
+            self.image_names = ["Original","Processed"]
         except:
             print traceback.format_exc()
 
