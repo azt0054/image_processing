@@ -94,15 +94,36 @@ def resize(image,background_color=background_color):
 
 def getHSV(image):
     height, width = image.shape[:2]
-    min_hsv = [179,255,255]
-    max_hsv = [0,0,0]
 
-    boundry = [
+    corners = [
         image[0:corner_size, 0:corner_size],
         image[height-corner_size:height, 0:corner_size],
         image[0:corner_size, width-corner_size:width],
         image[height-corner_size:height, width-corner_size:width],
     ]
+
+    edge_hsv_info = []
+    if edge_depth:
+        row_mid = height/2
+        col_mid = width/2
+        edges = [
+            image[row_mid:row_mid+corner_size, 0:edge_depth],
+            image[0:edge_depth, col_mid:col_mid+corner_size],
+            image[row_mid:row_mid+corner_size, width-edge_depth:width],
+            image[height-edge_depth:height, col_mid:col_mid+corner_size],
+        ]
+        for edge in edges:
+            edge_hsv = getHSVOnROI([edge])
+            edge_hsv_info.append(edge_hsv)
+
+
+    min_hsv, max_hsv = getHSVOnROI(corners)
+
+    return min_hsv, max_hsv, edge_hsv_info
+
+def getHSVOnROI(boundry):
+    min_hsv = [179,255,255]
+    max_hsv = [0,0,0]
 
     for roi in boundry:
         hsv = cv2.cvtColor(roi,cv2.COLOR_BGR2HSV)
@@ -114,13 +135,16 @@ def getHSV(image):
                 min_hsv[index] = roi_min[index]
             if roi_max[index] > max_hsv[index]:
                 max_hsv[index] = roi_max[index]
-
     return min_hsv, max_hsv
+
 
 def checkDir(*directories):
     for directory in directories:
         if not os.path.exists(directory):
             os.makedirs(directory)
+
+def env(env_name):
+    return os.environ.get(env_name)
 
 def log(*log_string):
     log_string = " ".join(log_string)

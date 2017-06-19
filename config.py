@@ -5,14 +5,20 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 
 #-- image directories --#
 image_root_dir = os.path.join(dir_path,"images")
-source_image_dir = os.path.join(image_root_dir,"original")
+s3_image_local_dir = os.path.join(image_root_dir,"s3")
+source_image_dir = os.path.join(image_root_dir,"s3")
 processed_image_dir = os.path.join(image_root_dir,"processed")
 background_image_dir = os.path.join(processed_image_dir,"background_images")
 backgroundless_image_dir = os.path.join(processed_image_dir,"backgroundless_images")
 
+s3_bucket_name = "shipt-staging"
+s3_image_dir = "images/products/"
+
+max_download_count = 100
+
 acceptable_image_type = ["jpg", "jpeg", "png"]
 
-corner_size = 30                                                   #for background detection
+corner_size = 8                                                   #for background detection
 edge_depth = 2                                                     #for background detection
 kernel_size = (5,5)                                                #for pixel level operations
 

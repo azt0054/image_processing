@@ -65,18 +65,54 @@ class CVFilter:
 
 
     def hasBackground(self):
-        min_hsv, max_hsv = getHSV(self.org_image)
-        if min_hsv==max_hsv==[0, 0, 255]:                                                           # have white bg on all corners
-            #log("has white background on the edges/ cropped already")
-            return False
-        elif max_hsv[1]>80 or (min_hsv[0]==min_hsv[1]==0 and max_hsv[2]==255 and min_hsv[2]>220):   # have very solid color close to edge or 100% cropped
-            #log("has very solid color close to the edge/ cropped already")
-            return False
-        elif max_hsv[1]>40 and min_hsv[1]==0:                                                       # have solid color close to the edge and may also be cropped
-            #log("has solid color close to the edge/ cropped already")
-            return False
+        min_hsv, max_hsv, edge_hsv_info = getHSV(self.org_image)
+        if edge_depth:
+            return self.checkCorners(min_hsv,max_hsv) or  self.checkEdges(edge_hsv_info)
         else:
-            return True
+            return self.checkCorners(min_hsv,max_hsv)
+
+
+    def checkCorners(self,min_hsv,max_hsv):
+        if self.org_filename.endswith('png'):
+            if min_hsv==max_hsv==[0, 0, 0] or min_hsv==max_hsv==[0, 0, 255]:                                                           # have white bg on all corners
+                return False
+            else:
+                return True
+        else:
+            if min_hsv[:2]==max_hsv[:2]==[0, 0,] and min_hsv[2]==max_hsv[2] > 250:                                                           # have white bg on all corners
+                #log("has white background on the edges/ cropped already")
+                return False
+            elif (min_hsv[0]==min_hsv[1]==0 and max_hsv[1]<5 and max_hsv[2]>250 and min_hsv[2]>240):   # have very solid color close to edge or 100% cropped
+                #log("has very solid color close to the edge/ cropped already")
+                return False
+            elif max_hsv[1]>100 and min_hsv[1]==0:
+                #log("has solid color close to the edge/ cropped already")
+                return False
+            elif min_hsv==max_hsv:
+                if min_hsv[0] > 80 and min_hsv[2]==255:
+                    return False
+                elif min_hsv[1]<4 and min_hsv[2] > 250:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+
+    def checkEdges(self,edge_hsv_info):
+        left,top,right,bottom = edge_hsv_info
+        background_color_tuple = ([0, 0, 255], [0, 0, 255])
+        if left==right==background_color_tuple:
+            if top!=background_color_tuple and bottom!=background_color_tuple and min(zip(*top)[2])<240 and min(zip(*bottom)[2])<240:
+                return True
+            else:
+                return False
+        elif top==bottom==background_color_tuple:
+            if left!=background_color_tuple and right!=background_color_tuple and min(zip(*left)[2])<240 and min(zip(*right)[2])<240:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
     def blendMask(self,image,mask):
@@ -220,7 +256,7 @@ class CVFilter:
             self.image_list = [resize(self.org_image,0),resize(blended_grabcut)]
             self.image_names = ["Original","Processed"]
         except:
-            print traceback.format_exc()
+            traceback.print_exc()
 
 
 if __name__ == '__main__':
