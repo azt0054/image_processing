@@ -82,13 +82,13 @@ class Processor:
                     files.extend(filenames)
             if self.use_thread:
                 self.createFilterThread(self.use_thread)
-                for each_file in files[0:500]:
+                for each_file in files[0:10]:
                     self.filter_queue.put([each_file])
                 print "pushed into queue"
                 self.filter_queue.join()
             else:
                 self.runFilter(files)
-        log(self.exception_list)
+        log(*self.exception_list)
 
 
     def runFilter(self,files=[]):
