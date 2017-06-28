@@ -21,10 +21,12 @@ def getCannyEdge(image, threshold_limit=max_edge_threshold_limit):
     auto = autoCanny(image)
     return edge,auto
 
-def cannyEdge(filename,gamma_limit):
+def cannyEdge(filename,threshold_limit):
 	image = cv2.imread(filename)
-	edge,auto = getCannyEdge(image,gamma_limit)
-	stacked_image = hStack(edge,auto)
+	edge,auto = getCannyEdge(image,threshold_limit)
+	edge2,auto = getCannyEdge(image,20)
+	edge3,auto = getCannyEdge(image,10)
+	stacked_image = hStack(edge,edge2,edge3)
 	show(stacked_image)
 
 if __name__ == '__main__':

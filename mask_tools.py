@@ -9,7 +9,7 @@ def getSmallestRect(image, margin=10):
 
     origin_x,origin_y,rect_width,rect_height = cv2.boundingRect(image)
 
-    new_origin_x,new_origin_y = origin_x-margin if origin_x-margin>0 else 1,origin_y-margin if origin_y-margin>0 else 1
+    new_origin_x,new_origin_y = origin_x-margin if origin_x-margin>0 else 0,origin_y-margin if origin_y-margin>0 else 0
     adj_rect_width,adj_rect_height = rect_width + (origin_x - new_origin_x),rect_height + (origin_y - new_origin_y)
 
     if margin:
@@ -25,7 +25,10 @@ def getSmallestRect(image, margin=10):
 
     image_cp = image.copy()
     cv2.rectangle(image_cp,(new_origin_x,new_origin_y),(new_origin_x+rect_width,new_origin_y+rect_height),(255,255,255),3)
-    return new_origin_x,new_origin_y,rect_width,rect_height,image_cp
+    if new_origin_x==new_origin_y==0:
+        return new_origin_x,new_origin_y,rect_width-1,rect_height,image_cp
+    else:
+        return new_origin_x,new_origin_y,rect_width,rect_height,image_cp
 
 def createRectCuttingMask(image,x,y,width,height):
     ht, wd = image.shape[:2]

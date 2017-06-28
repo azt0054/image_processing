@@ -48,11 +48,11 @@ class S3Downloader:
                 break
 
     def getFile(self, file_name):
-        file_name = os.path.join(s3_image_dir,file_name)
-        item = self.bucket.get_key(file_name)
+        s3_file_name = os.path.join(s3_image_dir,file_name)
+        item = self.bucket.get_key(s3_file_name)
         if item:
-            if self.saveFile(item,file_name.split('/')[-1]):
+            if self.saveFile(item,file_name):
                 return True
         else:
-            log("file not found!")
+            log("file not found! ->",file_name)
         return False
